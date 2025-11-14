@@ -1,0 +1,512 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - ChaosCompany{% endblock %}
+
+{% block extra_css %}
+<style>
+.xbox-ticket-detail {
+    background: var(--xbox-dark);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+}
+
+.ticket-detail-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.ticket-detail-header h1 {
+    font-size: 2.5em;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.ticket-detail-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.ticket-info-card {
+    background: var(--xbox-gray);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid var(--xbox-light);
+    margin-bottom: 2rem;
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.ticket-meta {
+    flex: 1;
+}
+
+.ticket-title {
+    color: var(--text-light);
+    font-size: 1.8em;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.ticket-details {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.ticket-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.detail-value {
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.ticket-status {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.status-open {
+    background: rgba(16, 124, 16, 0.2);
+    color: var(--xbox-green);
+    border: 1px solid rgba(16, 124, 16, 0.3);
+}
+
+.status-pending {
+    background: rgba(255, 170, 0, 0.2);
+    color: var(--warning-color);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+}
+
+.status-resolved {
+    background: rgba(0, 123, 255, 0.2);
+    color: #007bff;
+    border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+.status-closed {
+    background: rgba(108, 117, 125, 0.2);
+    color: #6c757d;
+    border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.ticket-description {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+    border: 1px solid var(--xbox-light);
+}
+
+.ticket-description h3 {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    font-size: 1.3em;
+}
+
+.ticket-description-content {
+    color: var(--text-muted);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.ticket-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.conversation-section {
+    background: var(--xbox-gray);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid var(--xbox-light);
+    margin-bottom: 2rem;
+}
+
+.conversation-section h2 {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    font-size: 1.5em;
+    border-bottom: 2px solid var(--xbox-green);
+    padding-bottom: 0.5rem;
+}
+
+.conversation-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.message {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid var(--xbox-light);
+}
+
+.message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--xbox-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    flex-shrink: 0;
+}
+
+.message-content {
+    flex: 1;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.message-sender {
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.message-time {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.message-text {
+    color: var(--text-muted);
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.message-support {
+    border-left: 4px solid var(--xbox-green);
+}
+
+.message-user {
+    border-left: 4px solid #007bff;
+}
+
+.reply-section {
+    background: var(--xbox-gray);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid var(--xbox-light);
+}
+
+.reply-section h3 {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    font-size: 1.3em;
+}
+
+.reply-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.reply-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--xbox-light);
+    border-radius: 8px;
+    color: var(--text-light);
+    font-size: 1rem;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.reply-textarea:focus {
+    outline: none;
+    border-color: var(--xbox-green);
+    box-shadow: 0 0 0 3px rgba(16, 124, 16, 0.2);
+}
+
+.reply-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.no-messages {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid var(--xbox-light);
+}
+
+.no-messages i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--xbox-light);
+}
+
+@media (max-width: 768px) {
+    .ticket-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .ticket-details {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .ticket-actions {
+        flex-direction: column;
+    }
+    
+    .message {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .message-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="xbox-ticket-detail">
+    <div class="ticket-detail-header">
+        <h1>📋 Detalle del Ticket</h1>
+        <p>Sigue la conversación y el estado de tu solicitud de soporte</p>
+    </div>
+
+    <div class="ticket-detail-container">
+        <!-- Información del Ticket -->
+        <div class="ticket-info-card">
+            <div class="ticket-header">
+                <div class="ticket-meta">
+                    <h2 class="ticket-title">{{ ticket.subject }}</h2>
+                    <div class="ticket-details">
+                        <div class="ticket-detail-item">
+                            <span class="detail-label">Número de Ticket</span>
+                            <span class="detail-value">#CC-{{ ticket.id|stringformat:"04d" }}</span>
+                        </div>
+                        <div class="ticket-detail-item">
+                            <span class="detail-label">Categoría</span>
+                            <span class="detail-value">
+                                {% if ticket.category == 'technical' %}
+                                    🔧 Problemas Técnicos
+                                {% elif ticket.category == 'billing' %}
+                                    💳 Facturación y Pagos
+                                {% elif ticket.category == 'game' %}
+                                    🎮 Problemas con Juegos
+                                {% elif ticket.category == 'account' %}
+                                    👤 Cuenta y Perfil
+                                {% elif ticket.category == 'streaming' %}
+                                    📺 Streaming y Latencia
+                                {% elif ticket.category == 'membership' %}
+                                    👑 Membresía y Suscripción
+                                {% else %}
+                                    ❓ Otro
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="ticket-detail-item">
+                            <span class="detail-label">Fecha de Creación</span>
+                            <span class="detail-value">{{ ticket.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="ticket-detail-item">
+                            <span class="detail-label">Última Actualización</span>
+                            <span class="detail-value">{{ ticket.updated_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ticket-status status-{{ ticket.status }}">
+                    {% if ticket.status == 'open' %}
+                        🔓 Abierto
+                    {% elif ticket.status == 'pending' %}
+                        ⏳ En Proceso
+                    {% elif ticket.status == 'resolved' %}
+                        ✅ Resuelto
+                    {% elif ticket.status == 'closed' %}
+                        🔒 Cerrado
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="ticket-description">
+                <h3>📝 Descripción del Problema</h3>
+                <div class="ticket-description-content">
+                    {{ ticket.description|linebreaksbr }}
+                </div>
+            </div>
+
+            <div class="ticket-actions">
+                <a href="{% url 'ticket_list' %}" class="btn-xbox-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver a la Lista
+                </a>
+                {% if ticket.status == 'open' or ticket.status == 'pending' %}
+                <button class="btn-xbox-primary" onclick="document.getElementById('replyForm').scrollIntoView({ behavior: 'smooth' })">
+                    <i class="fas fa-reply"></i>
+                    Agregar Comentario
+                </button>
+                {% endif %}
+                {% if ticket.status == 'resolved' %}
+                <form method="post" action="{% url 'close_ticket' ticket.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-xbox-secondary">
+                        <i class="fas fa-lock"></i>
+                        Cerrar Ticket
+                    </button>
+                </form>
+                {% endif %}
+                {% if ticket.status == 'closed' %}
+                <form method="post" action="{% url 'reopen_ticket' ticket.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-xbox-primary">
+                        <i class="fas fa-lock-open"></i>
+                        Reabrir Ticket
+                    </button>
+                </form>
+                <form method="post" action="{% url 'delete_ticket' ticket.id %}" style="display: inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este ticket? Esta acción no se puede deshacer.');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-xbox-secondary" style="background: var(--error-color);">
+                        <i class="fas fa-trash"></i>
+                        Eliminar Ticket
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Historial de Conversación -->
+        <div class="conversation-section">
+            <h2>💬 Historial de Conversación</h2>
+            
+            <div class="conversation-timeline">
+                <!-- Mensaje inicial del usuario -->
+                <div class="message message-user">
+                    <div class="message-avatar">
+                        {{ ticket.user.username|first|upper }}
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">{{ ticket.user.username }}</span>
+                            <span class="message-time">{{ ticket.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="message-text">
+                            {{ ticket.description|linebreaksbr }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Respuestas -->
+                {% for response in responses %}
+                <div class="message {% if response.is_from_support %}message-support{% else %}message-user{% endif %}">
+                    <div class="message-avatar" style="{% if response.is_from_support %}background: var(--xbox-green);{% else %}background: #007bff;{% endif %}">
+                        {% if response.is_from_support %}S{% else %}{{ response.user.username|first|upper }}{% endif %}
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">
+                                {% if response.is_from_support %}
+                                    Soporte ChaosCompany
+                                {% else %}
+                                    {{ response.user.username }}
+                                {% endif %}
+                            </span>
+                            <span class="message-time">{{ response.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="message-text">
+                            {{ response.message|linebreaksbr }}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-messages">
+                    <i class="fas fa-comments"></i>
+                    <h3>No hay respuestas aún</h3>
+                    <p>Nuestro equipo de soporte revisará tu ticket pronto y te responderá aquí.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Formulario de Respuesta (solo para tickets abiertos) -->
+        {% if ticket.status == 'open' or ticket.status == 'pending' %}
+        <div class="reply-section" id="replyForm">
+            <h3>✏️ Agregar Comentario</h3>
+            <form method="post" action="{% url 'add_ticket_response' ticket.id %}" class="reply-form">
+                {% csrf_token %}
+                <textarea name="message" class="reply-textarea" 
+                          placeholder="Escribe tu comentario o información adicional aquí..." 
+                          required></textarea>
+                <div class="reply-actions">
+                    <button type="submit" class="btn-xbox-primary">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Comentario
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Información de Contacto -->
+        <div class="ticket-info-card">
+            <h3 style="color: var(--text-light); margin-bottom: 1rem;">📞 Información de Contacto</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                <div>
+                    <h4 style="color: var(--xbox-green); margin-bottom: 0.5rem;">Tiempo de Respuesta Promedio</h4>
+                    <p style="color: var(--text-muted);">
+                        <i class="fas fa-clock"></i> 2-4 horas durante horario laboral
+                    </p>
+                </div>
+                <div>
+                    <h4 style="color: var(--xbox-green); margin-bottom: 0.5rem;">Horario de Soporte</h4>
+                    <p style="color: var(--text-muted);">
+                        <i class="fas fa-calendar"></i> Lunes a Viernes: 9:00 - 18:00
+                    </p>
+                </div>
+                <div>
+                    <h4 style="color: var(--xbox-green); margin-bottom: 0.5rem;">Contacto Urgente</h4>
+                    <p style="color: var(--text-muted);">
+                        <i class="fas fa-phone"></i> +1 (555) 123-CHAOS
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,551 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Tickets de Soporte - ChaosCompany{% endblock %}
+
+{% block extra_css %}
+<style>
+.xbox-support {
+    background: var(--xbox-dark);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+}
+
+.support-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.support-header h1 {
+    font-size: 3em;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.support-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.support-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.support-stat-card {
+    background: var(--xbox-gray);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--xbox-light);
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2em;
+    color: var(--xbox-green);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.tickets-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.tickets-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.tickets-filter {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: var(--xbox-gray);
+    border: 2px solid var(--xbox-light);
+    color: var(--text-light);
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: var(--xbox-green);
+    border-color: var(--xbox-green);
+    color: white;
+}
+
+.tickets-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.ticket-card {
+    background: var(--xbox-gray);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--xbox-light);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.ticket-card:hover {
+    border-color: var(--xbox-green);
+    transform: translateX(5px);
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.ticket-title {
+    color: var(--text-light);
+    font-size: 1.3em;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.ticket-meta {
+    display: flex;
+    gap: 1rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.ticket-id {
+    color: var(--xbox-green);
+    font-weight: 500;
+}
+
+.ticket-status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-open {
+    background: rgba(16, 124, 16, 0.2);
+    color: var(--xbox-green);
+    border: 1px solid rgba(16, 124, 16, 0.3);
+}
+
+.status-pending {
+    background: rgba(255, 170, 0, 0.2);
+    color: var(--warning-color);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+}
+
+.status-resolved {
+    background: rgba(0, 123, 255, 0.2);
+    color: #007bff;
+    border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+.status-closed {
+    background: rgba(108, 117, 125, 0.2);
+    color: #6c757d;
+    border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.ticket-priority {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.priority-high {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.priority-medium {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.priority-low {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.ticket-description {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.ticket-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--xbox-light);
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.ticket-game {
+    color: var(--xbox-green);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.ticket-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.last-update {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.empty-tickets {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 4rem 2rem;
+    background: var(--xbox-gray);
+    border-radius: 12px;
+    border: 1px solid var(--xbox-light);
+}
+
+.empty-tickets i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: var(--xbox-light);
+}
+
+.quick-support {
+    background: var(--xbox-gray);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--xbox-light);
+}
+
+.quick-support h3 {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    font-size: 1.5em;
+}
+
+.support-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.support-category {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.support-category:hover {
+    border-color: var(--xbox-green);
+    transform: translateY(-2px);
+}
+
+.support-category i {
+    font-size: 2rem;
+    color: var(--xbox-green);
+    margin-bottom: 1rem;
+}
+
+.support-category h4 {
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.support-category p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .support-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .ticket-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .ticket-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .support-categories {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="xbox-support">
+    <div class="support-header">
+        <h1>🎫 Centro de Soporte</h1>
+        <p>Gestiona tus tickets de soporte y obtén ayuda cuando la necesites</p>
+    </div>
+
+    <div class="support-actions">
+        <a href="{% url 'create_ticket' %}" class="btn-xbox-primary">
+            <i class="fas fa-plus"></i> Nuevo Ticket
+        </a>
+        <a href="#" class="btn-xbox-secondary">
+            <i class="fas fa-question-circle"></i> Preguntas Frecuentes
+        </a>
+        <a href="#" class="btn-xbox-secondary">
+            <i class="fas fa-comments"></i> Chat en Vivo
+        </a>
+    </div>
+
+    <div class="support-stats">
+        <div class="support-stat-card">
+            <div class="stat-number">{{ open_tickets|default:"3" }}</div>
+            <div class="stat-label">Tickets Abiertos</div>
+        </div>
+        <div class="support-stat-card">
+            <div class="stat-number">{{ pending_tickets|default:"1" }}</div>
+            <div class="stat-label">En Proceso</div>
+        </div>
+        <div class="support-stat-card">
+            <div class="stat-number">{{ resolved_tickets|default:"12" }}</div>
+            <div class="stat-label">Resueltos</div>
+        </div>
+        <div class="support-stat-card">
+            <div class="stat-number">{{ avg_response_time|default:"2h" }}</div>
+            <div class="stat-label">Tiempo Respuesta Promedio</div>
+        </div>
+    </div>
+
+    <!-- Soporte Rápido -->
+    <div class="quick-support">
+        <h3>🚀 Soporte Rápido</h3>
+        <div class="support-categories">
+            <div class="support-category" onclick="location.href='{% url 'create_ticket' %}?category=technical'">
+                <i class="fas fa-tools"></i>
+                <h4>Problemas Técnicos</h4>
+                <p>Problemas con streaming, conexión o rendimiento</p>
+            </div>
+            <div class="support-category" onclick="location.href='{% url 'create_ticket' %}?category=billing'">
+                <i class="fas fa-credit-card"></i>
+                <h4>Facturación</h4>
+                <p>Problemas con pagos, suscripciones o facturas</p>
+            </div>
+            <div class="support-category" onclick="location.href='{% url 'create_ticket' %}?category=game'">
+                <i class="fas fa-gamepad"></i>
+                <h4>Problemas con Juegos</h4>
+                <p>Errores en juegos, progreso perdido o logros</p>
+            </div>
+            <div class="support-category" onclick="location.href='{% url 'create_ticket' %}?category=account'">
+                <i class="fas fa-user-cog"></i>
+                <h4>Cuenta y Perfil</h4>
+                <p>Problemas con tu cuenta, perfil o configuración</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="tickets-container">
+        <div class="tickets-header">
+            <h2 style="color: var(--text-light);">Mis Tickets</h2>
+            <div class="tickets-filter">
+                <button class="filter-btn active" data-filter="all">Todos</button>
+                <button class="filter-btn" data-filter="open">Abiertos</button>
+                <button class="filter-btn" data-filter="pending">En Proceso</button>
+                <button class="filter-btn" data-filter="resolved">Resueltos</button>
+            </div>
+        </div>
+
+        <div class="tickets-grid">
+            <!-- Ticket 1 -->
+            <div class="ticket-card" data-status="open">
+                <div class="ticket-header">
+                    <div>
+                        <h3 class="ticket-title">Problema de latencia en Fortnite</h3>
+                        <div class="ticket-meta">
+                            <span class="ticket-id">#CC-2024-001</span>
+                            <span class="ticket-status status-open">Abierto</span>
+                            <span class="ticket-priority priority-high">Alta</span>
+                            <span>Creado: 13/11/2024</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="ticket-description">
+                    Experimentando alta latencia (150ms+) en Fortnite durante las horas pico. El problema comenzó ayer y persiste hoy. Otros juegos funcionan correctamente.
+                </p>
+                <div class="ticket-footer">
+                    <span class="ticket-game">Fortnite</span>
+                    <div class="ticket-actions">
+                        <a href="#" class="btn-xbox-secondary btn-sm">Ver Detalles</a>
+                        <a href="#" class="btn-xbox-secondary btn-sm">Agregar Comentario</a>
+                    </div>
+                    <span class="last-update">Última actualización: Hoy 14:30</span>
+                </div>
+            </div>
+
+            <!-- Ticket 2 -->
+            <div class="ticket-card" data-status="pending">
+                <div class="ticket-header">
+                    <div>
+                        <h3 class="ticket-title">Problema con logro no desbloqueado</h3>
+                        <div class="ticket-meta">
+                            <span class="ticket-id">#CC-2024-002</span>
+                            <span class="ticket-status status-pending">En Proceso</span>
+                            <span class="ticket-priority priority-medium">Media</span>
+                            <span>Creado: 12/11/2024</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="ticket-description">
+                    El logro "Night City Legend" en Cyberpunk 2077 no se desbloqueó a pesar de cumplir todos los requisitos. He completado el juego en modo muy difícil.
+                </p>
+                <div class="ticket-footer">
+                    <span class="ticket-game">Cyberpunk 2077</span>
+                    <div class="ticket-actions">
+                        <a href="#" class="btn-xbox-secondary btn-sm">Ver Detalles</a>
+                        <a href="#" class="btn-xbox-secondary btn-sm">Agregar Comentario</a>
+                    </div>
+                    <span class="last-update">Última actualización: Hoy 10:15</span>
+                </div>
+            </div>
+
+            <!-- Ticket 3 -->
+            <div class="ticket-card" data-status="resolved">
+                <div class="ticket-header">
+                    <div>
+                        <h3 class="ticket-title">Error al procesar pago mensual</h3>
+                        <div class="ticket-meta">
+                            <span class="ticket-id">#CC-2024-003</span>
+                            <span class="ticket-status status-resolved">Resuelto</span>
+                            <span class="ticket-priority priority-high">Alta</span>
+                            <span>Creado: 10/11/2024</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="ticket-description">
+                    Mi tarjeta de crédito fue rechazada durante el cargo mensual de la suscripción GamePass Ultimate. La tarjeta tiene fondos suficientes y está activa.
+                </p>
+                <div class="ticket-footer">
+                    <span class="ticket-game">Suscripción</span>
+                    <div class="ticket-actions">
+                        <a href="#" class="btn-xbox-secondary btn-sm">Ver Detalles</a>
+                        <a href="#" class="btn-xbox-secondary btn-sm">Reabrir Ticket</a>
+                    </div>
+                    <span class="last-update">Resuelto: 11/11/2024</span>
+                </div>
+            </div>
+
+            <!-- Ticket 4 -->
+            <div class="ticket-card" data-status="open">
+                <div class="ticket-header">
+                    <div>
+                        <h3 class="ticket-title">Problema de audio en God of War</h3>
+                        <div class="ticket-meta">
+                            <span class="ticket-id">#CC-2024-004</span>
+                            <span class="ticket-status status-open">Abierto</span>
+                            <span class="ticket-priority priority-medium">Media</span>
+                            <span>Creado: 09/11/2024</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="ticket-description">
+                    El audio se corta intermitentemente durante las cinemáticas en God of War. El problema ocurre específicamente en escenas con mucho diálogo.
+                </p>
+                <div class="ticket-footer">
+                    <span class="ticket-game">God of War</span>
+                    <div class="ticket-actions">
+                        <a href="#" class="btn-xbox-secondary btn-sm">Ver Detalles</a>
+                        <a href="#" class="btn-xbox-secondary btn-sm">Agregar Comentario</a>
+                    </div>
+                    <span class="last-update">Última actualización: 10/11/2024</span>
+                </div>
+            </div>
+        </div>
+
+        {% if not tickets %}
+        <div class="empty-tickets">
+            <i class="fas fa-inbox"></i>
+            <h3>No hay tickets de soporte</h3>
+            <p>Cuando tengas algún problema, crea tu primer ticket de soporte y te ayudaremos inmediatamente.</p>
+            <a href="{% url 'create_ticket' %}" class="btn-xbox-primary" style="margin-top: 1rem;">
+                Crear Mi Primer Ticket
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const ticketCards = document.querySelectorAll('.ticket-card');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filter = this.getAttribute('data-filter');
+            
+            ticketCards.forEach(card => {
+                if (filter === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    const status = card.getAttribute('data-status');
+                    if (status === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

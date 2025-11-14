@@ -1,0 +1,206 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ChaosCompany{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="main-header">
+        <!-- Top Bar -->
+        <div class="header-top">
+            <div class="container">
+                <div class="brand">
+                    <div class="logo">
+                        <i class="fas fa-gamepad"></i>
+                        <span>ChaosCompany</span>
+                    </div>
+                </div>
+                
+                <!-- User Menu -->
+                <div class="user-menu">
+                    {% if user.is_authenticated %}
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <img src="{{ user.get_profile_picture_url }}" alt="{{ user.username }}">
+                            </div>
+                            <div class="user-dropdown">
+                                <button class="user-toggle">
+                                    <span class="username">{{ user.username }}</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div class="dropdown-content">
+                                    <a href="{% url 'profile' %}" class="dropdown-item">
+                                        <i class="fas fa-user"></i>
+                                        <span>Mi Perfil</span>
+                                    </a>
+                                    <a href="{% url 'user_library' %}" class="dropdown-item">
+                                        <i class="fas fa-gamepad"></i>
+                                        <span>Mi Biblioteca</span>
+                                    </a>
+                                    <a href="{% url 'user_achievements' %}" class="dropdown-item">
+                                        <i class="fas fa-trophy"></i>
+                                        <span>Mis Logros</span>
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a href="{% url 'logout' %}" class="dropdown-item logout">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Cerrar Sesión</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="auth-buttons">
+                            <a href="{% url 'login' %}" class="btn-login">Iniciar Sesión</a>
+                            <a href="{% url 'signup' %}" class="btn-signup">Registrarse</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Navigation -->
+        <nav class="main-nav">
+            <div class="container">
+                <ul class="nav-links">
+                    <li class="nav-item">
+                        <a href="{% url 'index' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                            <i class="fas fa-home"></i>
+                            <span>Inicio</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'game_catalog' %}" class="nav-link">
+                            <i class="fas fa-gamepad"></i>
+                            <span>Juegos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'gamepass' %}" class="nav-link">
+                            <i class="fas fa-star"></i>
+                            <span>GamePass</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'membresias' %}" class="nav-link">
+                            <i class="fas fa-crown"></i>
+                            <span>Membresías</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ventajas' %}" class="nav-link">
+                            <i class="fas fa-gem"></i>
+                            <span>Ventajas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'ticket_list' %}" class="nav-link">
+                            <i class="fas fa-headset"></i>
+                            <span>Soporte</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Cart Icon -->
+                <div class="nav-actions">
+                    <a href="{% url 'cart' %}" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% if request.session.cart %}
+                            <span class="cart-count">{{ request.session.cart|length }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">
+            <div class="message-content">
+                <i class="message-icon 
+                    {% if message.tags == 'success' %}fas fa-check-circle
+                    {% elif message.tags == 'error' %}fas fa-exclamation-circle
+                    {% elif message.tags == 'warning' %}fas fa-exclamation-triangle
+                    {% else %}fas fa-info-circle{% endif %}">
+                </i>
+                <span>{{ message }}</span>
+            </div>
+            <button class="message-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-gamepad"></i>
+                        <span>ChaosCompany</span>
+                    </div>
+                    <p class="footer-description">
+                        Tu plataforma de gaming en la nube. Juega donde quieras, cuando quieras.
+                    </p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Explorar</h4>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'index' %}">Inicio</a></li>
+                        <li><a href="{% url 'game_catalog' %}">Juegos</a></li>
+                        <li><a href="{% url 'gamepass' %}">GamePass</a></li>
+                        <li><a href="{% url 'membresias' %}">Membresías</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Soporte</h4>
+                    <ul class="footer-links">
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'create_ticket' %}">Crear Ticket</a></li>
+                        <li><a href="{% url 'ticket_list' %}">Mis Tickets</a></li>
+                        {% else %}
+                        <li><a href="{% url 'login' %}">Acceder al Soporte</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Términos de Servicio</a></li>
+                        <li><a href="#">Política de Privacidad</a></li>
+                        <li><a href="#">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 ChaosCompany. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'scripts.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

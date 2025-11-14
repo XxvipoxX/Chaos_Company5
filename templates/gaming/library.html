@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Biblioteca - ChaosCompany{% endblock %}
+
+{% block extra_css %}
+<style>
+.xbox-library {
+    background: var(--xbox-dark);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+}
+
+.library-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.library-header h1 {
+    font-size: 3em;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.library-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    background: var(--xbox-gray);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--xbox-light);
+    text-align: center;
+    min-width: 150px;
+}
+
+.stat-number {
+    font-size: 2em;
+    color: var(--xbox-green);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.library-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    border-bottom: 2px solid var(--xbox-light);
+    padding-bottom: 1rem;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 1rem 2rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: var(--transition);
+    border-bottom: 3px solid transparent;
+}
+
+.tab-btn.active {
+    color: var(--xbox-green);
+    border-bottom-color: var(--xbox-green);
+}
+
+.tab-btn:hover {
+    color: var(--text-light);
+}
+
+.tab-content {
+    display: none;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.library-game-card {
+    background: var(--xbox-gray);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: var(--transition);
+    border: 1px solid var(--xbox-light);
+    position: relative;
+}
+
+.library-game-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--xbox-green);
+    box-shadow: 0 8px 25px rgba(16, 124, 16, 0.3);
+}
+
+.library-game-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.library-game-info {
+    padding: 1.5rem;
+}
+
+.library-game-title {
+    color: var(--text-light);
+    font-size: 1.2em;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.library-game-meta {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.library-game-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.play-time {
+    color: var(--xbox-green);
+    font-weight: 500;
+}
+
+.last-played {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--xbox-light);
+    border-radius: 2px;
+    margin: 0.5rem 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--xbox-green);
+    border-radius: 2px;
+}
+
+.empty-library {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 4rem 2rem;
+    grid-column: 1 / -1;
+}
+
+.empty-library i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: var(--xbox-light);
+}
+
+.recently-played {
+    background: var(--xbox-gray);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--xbox-light);
+}
+
+.recently-played h3 {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    font-size: 1.5em;
+}
+
+@media (max-width: 768px) {
+    .library-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .library-stats {
+        gap: 1rem;
+    }
+    
+    .stat-card {
+        min-width: 120px;
+        padding: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="xbox-library">
+    <div class="library-header">
+        <h1>📚 Mi Biblioteca</h1>
+        <p>Gestiona tus juegos y sigue tu progreso</p>
+        
+        <div class="library-stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ owned_games|default:"15" }}</div>
+                <div class="stat-label">Juegos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ total_playtime|default:"127" }}h</div>
+                <div class="stat-label">Tiempo Jugado</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ achievements|default:"45" }}</div>
+                <div class="stat-label">Logros</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ completed_games|default:"8" }}</div>
+                <div class="stat-label">Completados</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="library-tabs">
+        <button class="tab-btn active" data-tab="all">Todos los Juegos</button>
+        <button class="tab-btn" data-tab="recent">Recientes</button>
+        <button class="tab-btn" data-tab="playing">Jugando Ahora</button>
+        <button class="tab-btn" data-tab="completed">Completados</button>
+    </div>
+
+    <!-- Juego Reciente Destacado -->
+    <div class="recently-played">
+        <h3>🎮 Jugando Recientemente</h3>
+        <div class="library-grid">
+            <div class="library-game-card">
+                <img src="{% static 'Imagenes/row1/cyberpunk.jpg' %}" alt="Cyberpunk 2077" class="library-game-image">
+                <div class="library-game-info">
+                    <h4 class="library-game-title">Cyberpunk 2077</h4>
+                    <div class="library-game-meta">
+                        <span class="play-time">🕒 28h 15m</span>
+                        <span>Último: Hoy</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%"></div>
+                    </div>
+                    <div class="library-game-actions">
+                        <a href="#" class="btn-xbox-primary">Continuar</a>
+                        <a href="#" class="btn-xbox-secondary">Logros</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Todos los Juegos -->
+    <div class="tab-content active" id="all-tab">
+        <div class="library-grid">
+            <!-- Juego 1 -->
+            <div class="library-game-card">
+                <img src="{% static 'Imagenes/row1/fortnite.jpg' %}" alt="Fortnite" class="library-game-image">
+                <div class="library-game-info">
+                    <h4 class="library-game-title">Fortnite</h4>
+                    <div class="library-game-meta">
+                        <span class="play-time">🕒 45h 30m</span>
+                        <span>Último: Ayer</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%"></div>
+                    </div>
+                    <div class="library-game-actions">
+                        <a href="#" class="btn-xbox-primary">Jugar</a>
+                        <a href="#" class="btn-xbox-secondary">Estadísticas</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Juego 2 -->
+            <div class="library-game-card">
+                <img src="{% static 'Imagenes/row3/god of war.jpg' %}" alt="God of War" class="library-game-image">
+                <div class="library-game-info">
+                    <h4 class="library-game-title">God of War</h4>
+                    <div class="library-game-meta">
+                        <span class="play-time">🕒 32h 10m</span>
+                        <span>Último: 2 días</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 90%"></div>
+                    </div>
+                    <div class="library-game-actions">
+                        <a href="#" class="btn-xbox-primary">Continuar</a>
+                        <a href="#" class="btn-xbox-secondary">Logros</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Juego 3 -->
+            <div class="library-game-card">
+                <img src="{% static 'Imagenes/row2/elden ring.jpg' %}" alt="Elden Ring" class="library-game-image">
+                <div class="library-game-info">
+                    <h4 class="library-game-title">Elden Ring</h4>
+                    <div class="library-game-meta">
+                        <span class="play-time">🕒 78h 45m</span>
+                        <span>Último: 1 semana</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="library-game-actions">
+                        <a href="#" class="btn-xbox-primary">Nueva Partida</a>
+                        <a href="#" class="btn-xbox-secondary">Logros</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Juego 4 -->
+            <div class="library-game-card">
+                <img src="{% static 'Imagenes/row3/fifa 24.jpeg' %}" alt="FIFA 24" class="library-game-image">
+                <div class="library-game-info">
+                    <h4 class="library-game-title">FIFA 24</h4>
+                    <div class="library-game-meta">
+                        <span class="play-time">🕒 22h 15m</span>
+                        <span>Último: 3 días</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 40%"></div>
+                    </div>
+                    <div class="library-game-actions">
+                        <a href="#" class="btn-xbox-primary">Jugar</a>
+                        <a href="#" class="btn-xbox-secondary">Amigos</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Juego 5 -->
+            <div class="library-game-card">
+                <img src="{% static 'Imagenes/row1/among-us.jpg' %}" alt="Among Us" class="library-game-image">
+                <div class="library-game-info">
+                    <h4 class="library-game-title">Among Us</h4>
+                    <div class="library-game-meta">
+                        <span class="play-time">🕒 15h 20m</span>
+                        <span>Último: 2 semanas</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+                    <div class="library-game-actions">
+                        <a href="#" class="btn-xbox-primary">Jugar</a>
+                        <a href="#" class="btn-xbox-secondary">Invitar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Juegos Recientes -->
+    <div class="tab-content" id="recent-tab">
+        <div class="library-grid">
+            <!-- Solo mostrar juegos jugados recientemente -->
+        </div>
+    </div>
+
+    <!-- Jugando Ahora -->
+    <div class="tab-content" id="playing-tab">
+        <div class="library-grid">
+            <!-- Solo mostrar juegos en progreso -->
+        </div>
+    </div>
+
+    <!-- Completados -->
+    <div class="tab-content" id="completed-tab">
+        <div class="library-grid">
+            <!-- Solo mostrar juegos completados al 100% -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            // Remove active class from all buttons and contents
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked button and corresponding content
+            this.classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,434 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Logros - ChaosCompany{% endblock %}
+
+{% block extra_css %}
+<style>
+.xbox-achievements {
+    background: var(--xbox-dark);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+}
+
+.achievements-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.achievements-header h1 {
+    font-size: 3em;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.gamer-score-display {
+    background: var(--xbox-gray);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--xbox-light);
+    max-width: 400px;
+    margin: 0 auto 2rem;
+    text-align: center;
+}
+
+.gamer-score-number {
+    font-size: 3em;
+    color: var(--xbox-green);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.gamer-score-label {
+    color: var(--text-muted);
+    font-size: 1.1em;
+}
+
+.achievements-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.achievement-stat-card {
+    background: var(--xbox-gray);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--xbox-light);
+    text-align: center;
+}
+
+.stat-icon {
+    font-size: 2em;
+    margin-bottom: 1rem;
+}
+
+.stat-number {
+    font-size: 1.8em;
+    color: var(--xbox-green);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.achievements-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    border-bottom: 2px solid var(--xbox-light);
+    padding-bottom: 1rem;
+}
+
+.achievements-grid {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.achievement-card {
+    background: var(--xbox-gray);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--xbox-light);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: var(--transition);
+}
+
+.achievement-card:hover {
+    border-color: var(--xbox-green);
+    transform: translateX(5px);
+}
+
+.achievement-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.achievement-icon.bronze {
+    background: linear-gradient(45deg, #cd7f32, #b08d57);
+}
+
+.achievement-icon.silver {
+    background: linear-gradient(45deg, #c0c0c0, #e8e8e8);
+    color: #333;
+}
+
+.achievement-icon.gold {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    color: #333;
+}
+
+.achievement-icon.platinum {
+    background: linear-gradient(45deg, #e5e4e2, #ffffff);
+    color: #333;
+}
+
+.achievement-info {
+    flex: 1;
+}
+
+.achievement-title {
+    color: var(--text-light);
+    font-size: 1.2em;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.achievement-description {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.achievement-game {
+    color: var(--xbox-green);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.achievement-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.achievement-points {
+    font-weight: bold;
+    color: var(--xbox-green);
+    font-size: 1.1em;
+}
+
+.achievement-date {
+    color: var(--text-muted);
+}
+
+.achievement-rarity {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.locked-achievement {
+    opacity: 0.6;
+}
+
+.locked-achievement .achievement-icon {
+    background: var(--xbox-light);
+    color: var(--text-muted);
+}
+
+.locked-achievement .achievement-title,
+.locked-achievement .achievement-description {
+    color: var(--text-muted);
+}
+
+.recent-achievements {
+    background: var(--xbox-gray);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--xbox-light);
+}
+
+.recent-achievements h3 {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    font-size: 1.5em;
+}
+
+@media (max-width: 768px) {
+    .achievements-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .achievement-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .achievement-meta {
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="xbox-achievements">
+    <div class="achievements-header">
+        <h1>🏆 Mis Logros</h1>
+        <p>Sigue tu progreso y colecciona logros en todos tus juegos</p>
+        
+        <div class="gamer-score-display">
+            <div class="gamer-score-number">{{ total_gamer_score|default:"2,450" }}</div>
+            <div class="gamer-score-label">Puntos de Jugador</div>
+        </div>
+    </div>
+
+    <div class="achievements-stats">
+        <div class="achievement-stat-card">
+            <div class="stat-icon">🥇</div>
+            <div class="stat-number">{{ total_achievements|default:"45" }}</div>
+            <div class="stat-label">Logros Desbloqueados</div>
+        </div>
+        <div class="achievement-stat-card">
+            <div class="stat-icon">🎮</div>
+            <div class="stat-number">{{ games_with_achievements|default:"8" }}</div>
+            <div class="stat-label">Juegos con Logros</div>
+        </div>
+        <div class="achievement-stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-number">{{ completion_rate|default:"68" }}%</div>
+            <div class="stat-label">Tasa de Completación</div>
+        </div>
+        <div class="achievement-stat-card">
+            <div class="stat-icon">👑</div>
+            <div class="stat-number">{{ rare_achievements|default:"5" }}</div>
+            <div class="stat-label">Logros Raros</div>
+        </div>
+    </div>
+
+    <!-- Logros Recientes -->
+    <div class="recent-achievements">
+        <h3>🆕 Logros Recientes</h3>
+        <div class="achievements-grid">
+            <!-- Logro 1 -->
+            <div class="achievement-card">
+                <div class="achievement-icon gold">
+                    🥇
+                </div>
+                <div class="achievement-info">
+                    <h4 class="achievement-title">Night City Legend</h4>
+                    <p class="achievement-description">Completa todas las misiones principales en modo muy difícil</p>
+                    <div class="achievement-game">Cyberpunk 2077</div>
+                </div>
+                <div class="achievement-meta">
+                    <span class="achievement-points">100G</span>
+                    <span class="achievement-date">Hoy</span>
+                    <span class="achievement-rarity">5.3%</span>
+                </div>
+            </div>
+
+            <!-- Logro 2 -->
+            <div class="achievement-card">
+                <div class="achievement-icon silver">
+                    🥈
+                </div>
+                <div class="achievement-info">
+                    <h4 class="achievement-title">Builder Master</h4>
+                    <p class="achievement-description">Construye 1000 estructuras en una sola partida</p>
+                    <div class="achievement-game">Fortnite</div>
+                </div>
+                <div class="achievement-meta">
+                    <span class="achievement-points">50G</span>
+                    <span class="achievement-date">Ayer</span>
+                    <span class="achievement-rarity">12.7%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Todos los Logros -->
+    <div class="achievements-tabs">
+        <button class="tab-btn active" data-tab="all">Todos los Logros</button>
+        <button class="tab-btn" data-tab="recent">Recientes</button>
+        <button class="tab-btn" data-tab="rare">Más Raros</button>
+        <button class="tab-btn" data-tab="locked">Por Desbloquear</button>
+    </div>
+
+    <div class="tab-content active" id="all-tab">
+        <div class="achievements-grid">
+            <!-- Logro 1 -->
+            <div class="achievement-card">
+                <div class="achievement-icon gold">
+                    🥇
+                </div>
+                <div class="achievement-info">
+                    <h4 class="achievement-title">Elden Lord</h4>
+                    <p class="achievement-description">Derrota al jefe final y convierte en Señor de Elden</p>
+                    <div class="achievement-game">Elden Ring</div>
+                </div>
+                <div class="achievement-meta">
+                    <span class="achievement-points">100G</span>
+                    <span class="achievement-date">15/11/2024</span>
+                    <span class="achievement-rarity">8.2%</span>
+                </div>
+            </div>
+
+            <!-- Logro 2 -->
+            <div class="achievement-card">
+                <div class="achievement-icon silver">
+                    🥈
+                </div>
+                <div class="achievement-info">
+                    <h4 class="achievement-title">God Slayer</h4>
+                    <p class="achievement-description">Derrota a todos los valquirias en God of War</p>
+                    <div class="achievement-game">God of War</div>
+                </div>
+                <div class="achievement-meta">
+                    <span class="achievement-points">75G</span>
+                    <span class="achievement-date">10/11/2024</span>
+                    <span class="achievement-rarity">15.4%</span>
+                </div>
+            </div>
+
+            <!-- Logro 3 -->
+            <div class="achievement-card">
+                <div class="achievement-icon bronze">
+                    🥉
+                </div>
+                <div class="achievement-info">
+                    <h4 class="achievement-title">Hat Trick Hero</h4>
+                    <p class="achievement-description">Anota 3 goles con un solo jugador en un partido</p>
+                    <div class="achievement-game">FIFA 24</div>
+                </div>
+                <div class="achievement-meta">
+                    <span class="achievement-points">25G</span>
+                    <span class="achievement-date">05/11/2024</span>
+                    <span class="achievement-rarity">32.1%</span>
+                </div>
+            </div>
+
+            <!-- Logro 4 (Bloqueado) -->
+            <div class="achievement-card locked-achievement">
+                <div class="achievement-icon">
+                    🔒
+                </div>
+                <div class="achievement-info">
+                    <h4 class="achievement-title">Impostor Master</h4>
+                    <p class="achievement-description">Gana 50 partidas como impostor</p>
+                    <div class="achievement-game">Among Us</div>
+                </div>
+                <div class="achievement-meta">
+                    <span class="achievement-points">30G</span>
+                    <span class="achievement-date">-</span>
+                    <span class="achievement-rarity">18.9%</span>
+                </div>
+            </div>
+
+            <!-- Logro 5 -->
+            <div class="achievement-card">
+                <div class="achievement-icon platinum">
+                    💎
+                </div>
+                <div class="achievement-info">
+                    <h4 class="achievement-title">Platinum Trophy</h4>
+                    <p class="achievement-description">Desbloquea todos los logros del juego</p>
+                    <div class="achievement-game">Cyberpunk 2077</div>
+                </div>
+                <div class="achievement-meta">
+                    <span class="achievement-points">300G</span>
+                    <span class="achievement-date">01/11/2024</span>
+                    <span class="achievement-rarity">3.7%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Reutilizar el script de tabs del template anterior
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const tabId = this.getAttribute('data-tab');
+            
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            this.classList.add('active');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        });
+    });
+});
+</script>
+{% endblock %}
