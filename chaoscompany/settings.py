@@ -1,11 +1,9 @@
 from pathlib import Path
 import os
-# La importación de dj_database_url fue la causa de un error. 
-# Si no está en requirements.txt, debe estar comentada:
+# La importación de dj_database_url debe estar comentada o eliminada si no está en requirements.txt
 # import dj_database_url 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# BASE_DIR apunta a la raíz del proyecto, donde está manage.py y el certificado.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -79,7 +77,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'chaoscompany.wsgi.application'
 
-# --- 🎯 Database - CONFIGURACIÓN AZURE MYSQL (RUTA SSL CORREGIDA) 🎯 ---
+# --- 🎯 Database - CONFIGURACIÓN AZURE MYSQL (SSL DESACTIVADO PARA DIAGNÓSTICO) 🎯 ---
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -89,8 +87,8 @@ DATABASES = {
         'HOST': os.environ.get('DB_HOST', 'mysql-chaoscompany-django.mysql.database.azure.com'),
         'PORT': os.environ.get('DB_PORT', '3306'),
         'OPTIONS': {
-            # 🚨 LA RUTA CORREGIDA: Apunta al certificado en la raíz del proyecto.
-            'ssl': {'ca': os.path.join(BASE_DIR, 'DigiCertGlobalRootG2.crt.pem')},
+            # 🚨 SSL COMENTADO: Prueba para ver si el problema es la contraseña/host, no el certificado.
+            # 'ssl': {'ca': os.path.join(BASE_DIR, 'DigiCertGlobalRootG2.crt.pem')},
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
         }
