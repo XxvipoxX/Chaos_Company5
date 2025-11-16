@@ -1,6 +1,6 @@
-# chaoscompany/settings.py
 from pathlib import Path
 import os
+import dj_database_url # Necesitas instalar esta librería para entornos más avanzados (opcional, pero útil)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,13 +9,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8i0hw4ovr8g!226b=3^b-q9e1516+c9h1#!@^1=k_*_icr$r10')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# La variable de entorno 'DEBUG' debe ser 'True' o 'False' (string)
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# ✅ CORREGIDO - DOMINIO ACTUAL
+# DOMINIO ACTUAL
 ALLOWED_HOSTS = [
-    'chaos-bsb8bjf6dkfgfhds.canadacentral-01.azurewebsites.net',  # ← DOMINIO CORRECTO
-    'localhost', 
-    '127.0.0.1'
+    'chaos-bsb8bjf6dkfgfhds.canadacentral-01.azurewebsites.net', 
+    'localhost',
+    '127.0.0.1',
+    # * Para producción, es mejor solo usar el dominio de Azure y 127.0.0.1
 ]
 
 # Application definition
@@ -45,6 +47,7 @@ LOGOUT_REDIRECT_URL = '/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise debe ir justo después de SecurityMiddleware
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -74,7 +77,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'chaoscompany.wsgi.application'
 
-# Database - CONFIGURACIÓN AZURE MYSQL
+# --- 🎯 Database - CONFIGURACIÓN AZURE MYSQL (CORREGIDA) 🎯 ---
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -84,12 +87,14 @@ DATABASES = {
         'HOST': os.environ.get('DB_HOST', 'mysql-chaoscompany-django.mysql.database.azure.com'),
         'PORT': os.environ.get('DB_PORT', '3306'),
         'OPTIONS': {
-            'ssl': {'ca': '/var/www/html/BaltimoreCyberTrustRoot.crt.pem'},
+            # RUTA DEL CERTIFICADO CORREGIDA: Apunta a la raíz del proyecto (BASE_DIR.parent)
+            'ssl': {'ca': os.path.join(BASE_DIR.parent, 'DigiCertGlobalRootG2.crt.pem')},
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
         }
     }
 }
+# -------------------------------------------------------------------
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -120,6 +125,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+# STATIC_ROOT DEBE SER LA CARPETA DONDE WhiteNoise y collectstatic GUARDARÁN LOS ARCHIVOS.
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # WhiteNoise configuration
