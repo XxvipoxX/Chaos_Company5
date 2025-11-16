@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
-import dj_database_url # Necesitas instalar esta librería para entornos más avanzados (opcional, pero útil)
+# La importación de dj_database_url debe estar comentada o eliminada si no está en requirements.txt
+# import dj_database_url 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -77,7 +78,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'chaoscompany.wsgi.application'
 
-# --- 🎯 Database - CONFIGURACIÓN AZURE MYSQL (CORREGIDA) 🎯 ---
+# --- 🎯 Database - CONFIGURACIÓN AZURE MYSQL (SSL DESACTIVADO PARA DIAGNÓSTICO) 🎯 ---
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -87,8 +88,8 @@ DATABASES = {
         'HOST': os.environ.get('DB_HOST', 'mysql-chaoscompany-django.mysql.database.azure.com'),
         'PORT': os.environ.get('DB_PORT', '3306'),
         'OPTIONS': {
-            # RUTA DEL CERTIFICADO CORREGIDA: Apunta a la raíz del proyecto (BASE_DIR.parent)
-            'ssl': {'ca': os.path.join(BASE_DIR.parent, 'DigiCertGlobalRootG2.crt.pem')},
+            # 🚨 LÍNEA SSL COMENTADA PARA PROBAR LA CONEXIÓN SIN CERTIFICADO 🚨
+            # 'ssl': {'ca': os.path.join(BASE_DIR.parent, 'DigiCertGlobalRootG2.crt.pem')},
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
         }
